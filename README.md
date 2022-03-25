@@ -38,3 +38,26 @@ Primitives:
         -> perform ownership transfer
         -> close channel
         -> encapsulate all of this and return reader only
+
+
+## Preventing goroutine leaks
+-> a groutine exits when
+    1. its done its job
+    2. panic
+    3. when its told
+-> 1 and 2 are pretty clear, but it might not always happen, for that we need 3.
+-> use of done channel
+```go
+func(done <-chan int) {
+    for {
+        select {
+            case <-done:
+                return
+            case ...
+        }
+    }
+}
+
+// the caller of the above goroutine funciton is responsible for closing the channel
+// or time.AfterFunc(DurationOfTime, close(done))
+```
