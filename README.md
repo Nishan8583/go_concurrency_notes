@@ -1,5 +1,6 @@
 # go_concurrency_notes
 Contains notes i made for myself while reading Oreillys Concurrency in Go
+NOTE: topic i found interesting and helpful and which required more explaination has a seperate sections on them.
 
 ## Common issues in concurrency:
 1. Race conditions: 2 or more threads trying to access data in the same time.
@@ -94,3 +95,24 @@ ctx,cancel := context.WithTimeout(context.Background(),5 *time.Second())
 defer cancel()
 ```
 -> Do not pass reference to context, even though context does not seem to change in the code, it changes in the background. having context of N call stack up is bad.
+
+-> when we build on top of parents context, parent is not affected
+```go
+func child(ctx, context.Context) {
+    ctx,cancel := context.WithTimeout(ctx,1 * time.Second)
+    // parents ctx is not affected
+}
+```
+
+## Error propagation:
+1. Error should contain
+    -> what happened: raw error, usually implicitly generated
+    -> when and where it occured: stack trace, timestamp in UTC, context it was running on, 
+    -> A friendly user message
+    -> How user can get more info: log ID may be ?
+
+Wrap error when passing between boundareis(packages)
+
+2. Timeout can cancellation
+-> prevent deadlocks
+-> remember to rollback changes, maybe implement in memory first?
